@@ -8,47 +8,69 @@ export default {
   theme: {
     extend: {
       colors: {
-        background: '#090D16',
+        background: 'var(--bg-main)',
+        sidebar: 'var(--bg-sidebar)',
         surface: {
-          DEFAULT: '#0F172A',
-          hover: '#17223B',
-          card: '#0D1527',
-          border: '#1E293B',
-          subtle: '#19243C'
+          DEFAULT: 'var(--surface-secondary)',
+          card: 'var(--surface-card)',
+          secondary: 'var(--surface-secondary)',
+          hover: 'var(--surface-hover)',
+          border: 'var(--border-color)',
+          subtle: 'var(--border-subtle)',
         },
-        brand: {
-          50: '#EEF2FF',
-          100: '#E0E7FF',
-          400: '#818CF8',
-          500: '#6366F1',
-          600: '#4F46E5',
+        border: {
+          DEFAULT: 'var(--border-color)',
+          subtle: 'var(--border-subtle)',
         },
+        primary: 'var(--text-primary)',
+        secondary: 'var(--text-secondary)',
+        muted: 'var(--text-muted)',
         accent: {
-          urgent: '#EF4444',
-          warning: '#F59E0B',
-          success: '#10B981',
-          info: '#3B82F6',
-          purple: '#8B5CF6'
-        }
+          DEFAULT: 'var(--accent-sage)',
+          hover: 'var(--accent-hover)',
+          soft: 'var(--accent-soft)',
+        },
+        graphite: 'var(--deep-graphite)',
+        semantic: {
+          urgent: {
+            DEFAULT: 'var(--semantic-urgent-text)',
+            bg: 'var(--semantic-urgent-bg)',
+            border: 'var(--semantic-urgent-border)',
+          },
+          important: {
+            DEFAULT: 'var(--semantic-important-text)',
+            bg: 'var(--semantic-important-bg)',
+            border: 'var(--semantic-important-border)',
+          },
+          info: {
+            DEFAULT: 'var(--semantic-info-text)',
+            bg: 'var(--semantic-info-bg)',
+            border: 'var(--semantic-info-border)',
+          },
+          success: {
+            DEFAULT: 'var(--semantic-success-text)',
+            bg: 'var(--semantic-success-bg)',
+            border: 'var(--semantic-success-border)',
+          },
+        },
       },
       fontFamily: {
-        sans: ['Plus Jakarta Sans', 'Inter', 'system-ui', 'sans-serif'],
+        sans: ['Inter', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'sans-serif'],
         mono: ['JetBrains Mono', 'Menlo', 'monospace'],
       },
+      boxShadow: {
+        subtle: '0 1px 2px 0 rgba(0, 0, 0, 0.04)',
+        card: '0 1px 3px 0 rgba(0, 0, 0, 0.06), 0 1px 2px 0 rgba(0, 0, 0, 0.03)',
+      },
       animation: {
-        'fade-in': 'fadeIn 0.25s ease-out forwards',
-        'pulse-subtle': 'pulseSubtle 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+        'fade-in': 'fadeIn 0.18s ease-out forwards',
       },
       keyframes: {
         fadeIn: {
-          '0%': { opacity: '0', transform: 'translateY(4px)' },
+          '0%': { opacity: '0', transform: 'translateY(2px)' },
           '100%': { opacity: '1', transform: 'translateY(0)' },
         },
-        pulseSubtle: {
-          '0%, 100%': { opacity: '1' },
-          '50%': { opacity: '0.65' },
-        }
-      }
+      },
     },
   },
   plugins: [],

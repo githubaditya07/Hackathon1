@@ -4,53 +4,123 @@
 
 @layer base {
   :root {
+    color-scheme: light;
+    --bg-main: #F5F4F0;
+    --bg-sidebar: #ECEAE4;
+    --surface-card: #FFFFFF;
+    --surface-secondary: #EAE8E1;
+    --surface-hover: #E2DFD7;
+    --border-color: #D9D7CF;
+    --border-subtle: #E2E0D8;
+    
+    --text-primary: #30322F;
+    --text-secondary: #74766F;
+    --text-muted: #92938C;
+    
+    --accent-sage: #788879;
+    --accent-hover: #657666;
+    --accent-soft: #E4EAE2;
+    --deep-graphite: #373936;
+
+    /* Semantic light */
+    --semantic-urgent-text: #9E3B3B;
+    --semantic-urgent-bg: #F8ECEC;
+    --semantic-urgent-border: #E8C4C4;
+
+    --semantic-important-text: #A06A28;
+    --semantic-important-bg: #FAF3E8;
+    --semantic-important-border: #EDDCBF;
+
+    --semantic-info-text: #4E6575;
+    --semantic-info-bg: #ECF2F6;
+    --semantic-info-border: #CFDCE4;
+
+    --semantic-success-text: #4E7A5A;
+    --semantic-success-bg: #EDF5EF;
+    --semantic-success-border: #C6DEC9;
+  }
+
+  .dark {
     color-scheme: dark;
+    --bg-main: #20211F;
+    --bg-sidebar: #252623;
+    --surface-card: #292A27;
+    --surface-secondary: #30312D;
+    --surface-hover: #363732;
+    --border-color: #3B3D37;
+    --border-subtle: #31332D;
+    
+    --text-primary: #ECEDE6;
+    --text-secondary: #B1B3AA;
+    --text-muted: #898C82;
+    
+    --accent-sage: #98AA96;
+    --accent-hover: #A9BBA7;
+    --accent-soft: #343D33;
+    --deep-graphite: #373936;
+
+    /* Semantic dark */
+    --semantic-urgent-text: #E27C7C;
+    --semantic-urgent-bg: #382323;
+    --semantic-urgent-border: #5C3535;
+
+    --semantic-important-text: #DCAC6A;
+    --semantic-important-bg: #362C1E;
+    --semantic-important-border: #5A482F;
+
+    --semantic-info-text: #8FAAB8;
+    --semantic-info-bg: #242D33;
+    --semantic-info-border: #3B4A54;
+
+    --semantic-success-text: #7EB88C;
+    --semantic-success-bg: #202E24;
+    --semantic-success-border: #354D3B;
   }
 
   body {
-    background-color: #090D16;
-    color: #F1F5F9;
-    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+    background-color: var(--bg-main);
+    color: var(--text-primary);
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   }
 }
 
-/* Custom linear/raycast-style scrollbars */
+/* Custom restrained scrollbars */
 ::-webkit-scrollbar {
-  width: 8px;
-  height: 8px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #090D16;
+  background: var(--bg-main);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #1E293B;
-  border-radius: 4px;
+  background: var(--border-color);
+  border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #334155;
+  background: var(--text-muted);
 }
 
-/* Pulse highlight animation for message traceability */
+/* Pulse highlight animation for message traceability using muted sage */
 @keyframes highlightPulse {
   0% {
-    background-color: rgba(99, 102, 241, 0.35);
-    border-color: rgba(129, 140, 248, 0.9);
-    box-shadow: 0 0 25px rgba(99, 102, 241, 0.4);
+    background-color: var(--accent-soft);
+    border-color: var(--accent-sage);
+    box-shadow: 0 0 0 2px var(--accent-sage);
   }
   50% {
-    background-color: rgba(99, 102, 241, 0.2);
-    border-color: rgba(99, 102, 241, 0.6);
+    background-color: var(--accent-soft);
+    border-color: var(--accent-hover);
   }
   100% {
-    background-color: rgba(15, 23, 42, 0.8);
-    border-color: #1E293B;
+    background-color: var(--surface-card);
+    border-color: var(--border-color);
     box-shadow: none;
   }
 }
 
 .highlight-source-message {
-  animation: highlightPulse 3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation: highlightPulse 2.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }

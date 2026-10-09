@@ -148,7 +148,7 @@ export interface UserPreferences {
   imminentHoursThreshold: number; // e.g. 36 hours
   localModelEnabled: boolean;
   localModelEndpoint: string;
-  theme: 'dark';
+  theme: 'light' | 'dark';
 }
 
 export interface ParseResult {

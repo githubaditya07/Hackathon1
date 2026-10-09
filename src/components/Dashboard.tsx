@@ -1,22 +1,25 @@
 import React from 'react';
 import {
   AlertTriangle,
-  CheckCircle2,
+  CheckSquare,
   Clock,
-  HelpCircle,
   TrendingUp,
   MessageSquare,
-  Sparkles,
   ArrowRight,
   RefreshCw,
   Award,
   Users,
   Calendar,
+  ExternalLink,
+  Plus,
+  Sparkles,
 } from 'lucide-react';
 import { Conversation, AnalysisResult, UserPreferences } from '../types';
 
 interface DashboardProps {
   conversation: Conversation | null;
+  conversations: Conversation[];
+  onSelectConversation: (id: string) => void;
   analysis: AnalysisResult | null;
   preferences: UserPreferences;
   onAnalyze: () => void;
@@ -29,6 +32,8 @@ interface DashboardProps {
 
 export const Dashboard: React.FC<DashboardProps> = ({
   conversation,
+  conversations,
+  onSelectConversation,
   analysis,
   preferences,
   onAnalyze,
@@ -40,27 +45,29 @@ export const Dashboard: React.FC<DashboardProps> = ({
 }) => {
   if (!conversation) {
     return (
-      <div className="max-w-4xl mx-auto py-16 px-4 text-center">
-        <div className="w-16 h-16 rounded-2xl bg-brand-500/10 border border-brand-500/20 flex items-center justify-center mx-auto mb-6">
-          <Sparkles className="w-8 h-8 text-brand-400" />
+      <div className="max-w-3xl mx-auto py-20 px-4 text-center">
+        <div className="w-12 h-12 rounded-lg bg-surface-secondary border border-border flex items-center justify-center mx-auto mb-4 text-accent">
+          <Sparkles className="w-6 h-6" />
         </div>
-        <h2 className="text-2xl font-bold text-white tracking-tight mb-3">No Conversation Loaded Yet</h2>
-        <p className="text-slate-400 max-w-lg mx-auto mb-8 text-sm">
-          UNREAD processes your message exports 100% locally on your computer. Load our built-in hackathon sprint sample or import your own chat export to get started.
+        <h2 className="text-xl font-semibold text-primary tracking-tight mb-2">
+          No Conversation Loaded
+        </h2>
+        <p className="text-secondary max-w-md mx-auto mb-6 text-xs leading-relaxed">
+          UNREAD runs genuine conversation intelligence on-device. Load our realistic hackathon team sprint demo or import a chat export (.txt / .json).
         </p>
-        <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+        <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
           <button
             onClick={onLoadDemo}
-            className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-semibold text-sm shadow-lg shadow-brand-500/25 transition-all hover:scale-105 active:scale-95 flex items-center justify-center space-x-2"
+            className="w-full sm:w-auto px-4 py-2 rounded-md bg-accent hover:bg-accent-hover text-white font-medium text-xs shadow-subtle transition-colors flex items-center justify-center space-x-1.5"
           >
-            <Sparkles className="w-4 h-4" />
+            <Sparkles className="w-3.5 h-3.5" />
             <span>Load Demo Conversation</span>
           </button>
           <button
             onClick={onOpenImport}
-            className="w-full sm:w-auto px-5 py-2.5 rounded-xl bg-surface border border-surface-border hover:bg-surface-hover text-slate-200 font-semibold text-sm transition-all"
+            className="w-full sm:w-auto px-4 py-2 rounded-md bg-surface-card border border-border hover:bg-surface-hover text-primary font-medium text-xs transition-colors"
           >
-            Import Chat File (.txt / .json)
+            Import Chat File
           </button>
         </div>
       </div>
@@ -80,299 +87,334 @@ export const Dashboard: React.FC<DashboardProps> = ({
   const topPriorities = analysis?.priorities?.slice(0, 5) || [];
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8 animate-fade-in">
-      {/* Welcome Banner & Overview Header */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-surface-border pb-6">
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 space-y-6 animate-fade-in">
+      {/* Header Bar */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-border">
         <div>
-          <div className="flex items-center space-x-3 mb-1">
-            <h1 className="text-2xl font-bold text-white tracking-tight">
-              Hello, {preferences.userName}
-            </h1>
-            <span className="px-2 py-0.5 text-xs font-medium bg-surface-subtle text-slate-300 border border-surface-border rounded-md">
+          <div className="flex items-center space-x-2.5">
+            <h2 className="text-lg font-semibold text-primary tracking-tight">
+              Briefing for {preferences.userName}
+            </h2>
+            <span className="text-xs px-2 py-0.5 rounded font-mono bg-surface-secondary text-secondary border border-border">
               {conversation.title}
             </span>
             {conversation.isSample && (
-              <span className="px-2 py-0.5 text-xs font-semibold bg-indigo-500/10 text-indigo-400 border border-indigo-500/20 rounded-md">
-                Sample Dataset
+              <span className="text-[10px] px-1.5 py-0.5 rounded font-mono bg-accent-soft text-accent border border-accent/20">
+                Sample
               </span>
             )}
           </div>
-          <p className="text-xs text-slate-400">
-            {stats.totalMessages} total messages analyzed • Last updated {analysis ? new Date(analysis.analyzedAt).toLocaleTimeString() : 'Never'}
+          <p className="text-xs text-muted mt-0.5">
+            {stats.totalMessages} messages ingested • Last analyzed{' '}
+            {analysis ? new Date(analysis.analyzedAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : 'Never'}
           </p>
         </div>
 
-        <div className="flex items-center space-x-3">
+        <div className="flex items-center space-x-2">
           <button
             onClick={onAnalyze}
             disabled={isAnalyzing}
-            className="flex items-center space-x-2 px-4 py-2 rounded-lg bg-surface border border-surface-border hover:border-slate-500 text-slate-200 text-xs font-medium transition-all active:scale-95 disabled:opacity-50"
+            className="flex items-center space-x-1.5 px-3 py-1.5 rounded-md bg-surface-card border border-border hover:bg-surface-hover text-primary text-xs font-medium transition-colors disabled:opacity-50"
           >
-            <RefreshCw className={`w-3.5 h-3.5 ${isAnalyzing ? 'animate-spin text-brand-400' : 'text-slate-400'}`} />
-            <span>{isAnalyzing ? 'Analyzing On-Device...' : 'Re-Analyze Conversation'}</span>
+            <RefreshCw className={`w-3.5 h-3.5 ${isAnalyzing ? 'animate-spin text-accent' : 'text-secondary'}`} />
+            <span>{isAnalyzing ? 'Processing...' : 'Re-Analyze'}</span>
+          </button>
+          <button
+            onClick={onOpenImport}
+            className="flex items-center space-x-1 px-3 py-1.5 rounded-md bg-accent hover:bg-accent-hover text-white text-xs font-medium transition-colors shadow-subtle"
+          >
+            <Plus className="w-3.5 h-3.5" />
+            <span>New Chat</span>
           </button>
         </div>
       </div>
 
-      {/* KPI Metric Cards Grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+      {/* Metrics Row: Compact & Restrained */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-2.5">
+        {/* Messages Analyzed */}
+        <div className="bg-surface-card border border-border rounded-md p-3">
+          <div className="text-[11px] text-muted font-medium mb-1 flex items-center justify-between">
+            <span>Analyzed</span>
+            <MessageSquare className="w-3.5 h-3.5 text-secondary" />
+          </div>
+          <div className="text-xl font-bold font-mono text-primary">{stats.totalMessages}</div>
+          <p className="text-[10px] text-muted mt-0.5">Total messages</p>
+        </div>
+
         {/* Urgent Items */}
         <div
           onClick={() => onNavigateToAction('urgent')}
-          className="bg-surface-card border border-surface-border hover:border-red-500/40 rounded-xl p-4 cursor-pointer transition-all hover:translate-y-[-2px] group"
+          className="bg-surface-card border border-border hover:border-semantic-urgent-border rounded-md p-3 cursor-pointer transition-colors group"
         >
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-[11px] font-medium text-slate-400">Urgent</span>
-            <AlertTriangle className="w-4 h-4 text-accent-urgent group-hover:scale-110 transition-transform" />
+          <div className="text-[11px] text-muted font-medium mb-1 flex items-center justify-between">
+            <span className="group-hover:text-semantic-urgent transition-colors">Urgent</span>
+            <AlertTriangle className="w-3.5 h-3.5 text-semantic-urgent" />
           </div>
-          <div className="text-2xl font-bold text-white">{stats.urgentCount}</div>
-          <p className="text-[10px] text-slate-500 mt-1">Requires immediate action</p>
+          <div className="text-xl font-bold font-mono text-semantic-urgent">{stats.urgentCount}</div>
+          <p className="text-[10px] text-muted mt-0.5">High priority</p>
         </div>
 
         {/* Pending Tasks */}
         <div
           onClick={() => onNavigateToAction('task')}
-          className="bg-surface-card border border-surface-border hover:border-amber-500/40 rounded-xl p-4 cursor-pointer transition-all hover:translate-y-[-2px] group"
+          className="bg-surface-card border border-border hover:border-semantic-important-border rounded-md p-3 cursor-pointer transition-colors group"
         >
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-[11px] font-medium text-slate-400">Tasks</span>
-            <CheckCircle2 className="w-4 h-4 text-accent-warning group-hover:scale-110 transition-transform" />
+          <div className="text-[11px] text-muted font-medium mb-1 flex items-center justify-between">
+            <span className="group-hover:text-semantic-important transition-colors">Tasks</span>
+            <CheckSquare className="w-3.5 h-3.5 text-semantic-important" />
           </div>
-          <div className="text-2xl font-bold text-white">{stats.taskCount}</div>
-          <p className="text-[10px] text-slate-500 mt-1">Action items tracked</p>
+          <div className="text-xl font-bold font-mono text-primary">{stats.taskCount}</div>
+          <p className="text-[10px] text-muted mt-0.5">Action items</p>
         </div>
 
         {/* Imminent Deadlines */}
         <div
           onClick={() => onNavigateToAction('deadline')}
-          className="bg-surface-card border border-surface-border hover:border-red-500/40 rounded-xl p-4 cursor-pointer transition-all hover:translate-y-[-2px] group"
+          className="bg-surface-card border border-border hover:border-semantic-urgent-border rounded-md p-3 cursor-pointer transition-colors group"
         >
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-[11px] font-medium text-slate-400">Deadlines</span>
-            <Clock className="w-4 h-4 text-rose-400 group-hover:scale-110 transition-transform" />
+          <div className="text-[11px] text-muted font-medium mb-1 flex items-center justify-between">
+            <span className="group-hover:text-semantic-urgent transition-colors">Deadlines</span>
+            <Clock className="w-3.5 h-3.5 text-semantic-urgent" />
           </div>
-          <div className="text-2xl font-bold text-white">{stats.imminentDeadlineCount}</div>
-          <p className="text-[10px] text-slate-500 mt-1">Within &lt; 36 hours</p>
+          <div className="text-xl font-bold font-mono text-primary">{stats.imminentDeadlineCount}</div>
+          <p className="text-[10px] text-muted mt-0.5">&lt; 36h cutoff</p>
         </div>
 
-        {/* Mentions */}
+        {/* Personal Mentions */}
         <div
           onClick={() => onNavigateToAction('mention')}
-          className="bg-surface-card border border-surface-border hover:border-indigo-500/40 rounded-xl p-4 cursor-pointer transition-all hover:translate-y-[-2px] group"
+          className="bg-surface-card border border-border hover:border-accent rounded-md p-3 cursor-pointer transition-colors group"
         >
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-[11px] font-medium text-slate-400">Mentions</span>
-            <Users className="w-4 h-4 text-brand-400 group-hover:scale-110 transition-transform" />
+          <div className="text-[11px] text-muted font-medium mb-1 flex items-center justify-between">
+            <span className="group-hover:text-accent transition-colors">Mentions</span>
+            <Users className="w-3.5 h-3.5 text-accent" />
           </div>
-          <div className="text-2xl font-bold text-white">{stats.mentionCount}</div>
-          <p className="text-[10px] text-slate-500 mt-1">Name & alias pings</p>
+          <div className="text-xl font-bold font-mono text-primary">{stats.mentionCount}</div>
+          <p className="text-[10px] text-muted mt-0.5">Tagged alerts</p>
         </div>
 
-        {/* Confirmed Decisions */}
+        {/* Decisions */}
         <div
           onClick={() => onNavigateToAction('decision')}
-          className="bg-surface-card border border-surface-border hover:border-emerald-500/40 rounded-xl p-4 cursor-pointer transition-all hover:translate-y-[-2px] group"
+          className="bg-surface-card border border-border hover:border-semantic-success-border rounded-md p-3 cursor-pointer transition-colors group"
         >
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-[11px] font-medium text-slate-400">Decisions</span>
-            <Award className="w-4 h-4 text-accent-success group-hover:scale-110 transition-transform" />
+          <div className="text-[11px] text-muted font-medium mb-1 flex items-center justify-between">
+            <span className="group-hover:text-semantic-success transition-colors">Decisions</span>
+            <Award className="w-3.5 h-3.5 text-semantic-success" />
           </div>
-          <div className="text-2xl font-bold text-white">{stats.decisionCount}</div>
-          <p className="text-[10px] text-slate-500 mt-1">Consensus recorded</p>
-        </div>
-
-        {/* Unanswered Questions */}
-        <div
-          onClick={() => onNavigateToAction('question')}
-          className="bg-surface-card border border-surface-border hover:border-blue-500/40 rounded-xl p-4 cursor-pointer transition-all hover:translate-y-[-2px] group"
-        >
-          <div className="flex items-center justify-between mb-2">
-            <span className="text-[11px] font-medium text-slate-400">Unanswered</span>
-            <HelpCircle className="w-4 h-4 text-accent-info group-hover:scale-110 transition-transform" />
-          </div>
-          <div className="text-2xl font-bold text-white">{stats.questionCount}</div>
-          <p className="text-[10px] text-slate-500 mt-1">Open team questions</p>
+          <div className="text-xl font-bold font-mono text-primary">{stats.decisionCount}</div>
+          <p className="text-[10px] text-muted mt-0.5">Team consensus</p>
         </div>
       </div>
 
-      {/* Executive Briefing Banner */}
+      {/* Catch-up Briefing (Executive Section) */}
       {analysis?.summary && (
-        <div className="bg-gradient-to-r from-surface-card via-surface to-surface-card border border-surface-border rounded-2xl p-6 relative overflow-hidden shadow-xl">
-          <div className="absolute top-0 right-0 w-72 h-72 bg-brand-500/5 rounded-full blur-3xl pointer-events-none" />
-          <div className="flex items-start space-x-4 relative z-10">
-            <div className="w-10 h-10 rounded-xl bg-brand-500/20 border border-brand-500/30 flex items-center justify-center flex-shrink-0 mt-0.5">
-              <Sparkles className="w-5 h-5 text-brand-400" />
+        <div className="bg-surface-card border border-border rounded-md p-4 sm:p-5 space-y-3 shadow-card">
+          <div className="flex items-center justify-between border-b border-border pb-2.5">
+            <div className="flex items-center space-x-2">
+              <span className="font-semibold text-xs text-primary uppercase tracking-wider">
+                Executive Catch-up Briefing
+              </span>
             </div>
-            <div className="space-y-2 flex-1">
-              <div className="flex items-center justify-between">
-                <h3 className="text-base font-semibold text-white">Executive Catch-up Briefing</h3>
-                <span className="text-[11px] text-slate-400 flex items-center space-x-1">
-                  <span className="w-2 h-2 rounded-full bg-emerald-400 inline-block animate-pulse" />
-                  <span>Deterministic Local NLP</span>
-                </span>
-              </div>
-              <p className="text-sm text-slate-300 leading-relaxed font-sans">
-                {analysis.summary.executiveSummary}
-              </p>
-              {analysis.summary.changeDelta && (
-                <div className="mt-3 text-xs text-brand-300/90 bg-brand-500/10 border border-brand-500/20 rounded-lg p-2.5">
-                  <strong>Delta:</strong> {analysis.summary.changeDelta}
-                </div>
-              )}
-            </div>
+            <span className="text-[11px] font-mono text-muted flex items-center space-x-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-semantic-success" />
+              <span>Deterministic NLP</span>
+            </span>
           </div>
+
+          <p className="text-xs text-primary leading-relaxed">
+            {analysis.summary.executiveSummary}
+          </p>
+
+          {analysis.summary.changeDelta && (
+            <div className="text-[11px] font-mono text-secondary bg-surface-secondary border border-border rounded p-2">
+              {analysis.summary.changeDelta}
+            </div>
+          )}
         </div>
       )}
 
-      {/* Main Grid: Top Priorities & Developments */}
+      {/* Two Column Layout: Priorities & Context Panels */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Top Priorities Column (2 cols wide) */}
-        <div className="lg:col-span-2 space-y-4">
+        {/* Left Column (2 cols): Top Priority List */}
+        <div className="lg:col-span-2 space-y-3">
           <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-2">
-              <TrendingUp className="w-4 h-4 text-brand-400" />
-              <h2 className="text-base font-semibold text-white">Top Priorities & Action Items</h2>
+            <div className="flex items-center space-x-1.5">
+              <TrendingUp className="w-3.5 h-3.5 text-accent" />
+              <h3 className="text-xs font-semibold text-primary uppercase tracking-wider">
+                Top Priorities
+              </h3>
             </div>
             <button
               onClick={() => onNavigateToAction('all')}
-              className="text-xs text-brand-400 hover:text-brand-300 flex items-center space-x-1 font-medium transition-colors"
+              className="text-xs text-accent hover:text-accent-hover font-medium flex items-center space-x-1"
             >
               <span>View all ({analysis?.priorities?.length || 0})</span>
               <ArrowRight className="w-3 h-3" />
             </button>
           </div>
 
-          <div className="space-y-3">
+          <div className="space-y-2">
             {topPriorities.length === 0 ? (
-              <div className="bg-surface-card border border-surface-border rounded-xl p-6 text-center text-slate-400 text-xs">
-                No critical priorities detected in this conversation yet.
+              <div className="bg-surface-card border border-border rounded-md p-8 text-center text-xs text-muted">
+                No urgent priorities detected in this conversation.
               </div>
             ) : (
-              topPriorities.map((item) => (
-                <div
-                  key={item.id}
-                  className="bg-surface-card border border-surface-border hover:border-slate-600 rounded-xl p-4 transition-all hover:bg-surface/50 group"
-                >
-                  <div className="flex items-start justify-between gap-3 mb-2">
-                    <div className="flex items-center space-x-2 flex-wrap gap-y-1">
-                      <span
-                        className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${
-                          item.level === 'urgent'
-                            ? 'bg-red-500/15 text-red-400 border border-red-500/30'
-                            : item.level === 'important'
-                            ? 'bg-amber-500/15 text-amber-400 border border-amber-500/30'
-                            : 'bg-blue-500/15 text-blue-400 border border-blue-500/30'
-                        }`}
-                      >
-                        {item.level}
-                      </span>
-                      <span className="px-2 py-0.5 rounded text-[10px] font-medium bg-surface text-slate-300 border border-surface-border uppercase">
-                        {item.category}
-                      </span>
-                      <span className="text-[11px] text-slate-400">
-                        from <strong className="text-slate-300">{item.sourceSender}</strong>
-                      </span>
+              topPriorities.map((item) => {
+                const isUrgent = item.level === 'urgent';
+                const isImportant = item.level === 'important';
+
+                return (
+                  <div
+                    key={item.id}
+                    className="bg-surface-card border border-border hover:border-secondary rounded-md p-3 transition-colors space-y-2"
+                  >
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex items-center space-x-2 flex-wrap gap-y-1">
+                        <span
+                          className={`px-1.5 py-0.5 rounded text-[10px] font-mono font-semibold uppercase ${
+                            isUrgent
+                              ? 'bg-semantic-urgent-bg text-semantic-urgent border border-semantic-urgent-border'
+                              : isImportant
+                              ? 'bg-semantic-important-bg text-semantic-important border border-semantic-important-border'
+                              : 'bg-semantic-info-bg text-semantic-info border border-semantic-info-border'
+                          }`}
+                        >
+                          {item.level}
+                        </span>
+                        <span className="px-1.5 py-0.5 rounded text-[10px] font-mono uppercase bg-surface-secondary text-secondary border border-border">
+                          {item.category}
+                        </span>
+                        <span className="text-[11px] text-muted">
+                          from <strong className="text-secondary font-medium">{item.sourceSender}</strong>
+                        </span>
+                      </div>
+
+                      <div className="flex items-center space-x-2 flex-shrink-0">
+                        <span className="text-[10px] font-mono text-muted">Score {item.score}</span>
+                        <button
+                          onClick={() => onJumpToMessage(item.sourceMessageId)}
+                          className="text-[11px] text-accent hover:text-accent-hover flex items-center space-x-0.5 bg-surface-secondary border border-border px-1.5 py-0.5 rounded hover:border-accent transition-colors"
+                          title="Jump to source message"
+                        >
+                          <span>Evidence</span>
+                          <ExternalLink className="w-2.5 h-2.5" />
+                        </button>
+                      </div>
                     </div>
 
-                    <div className="flex items-center space-x-2 flex-shrink-0">
-                      <span className="text-[11px] text-slate-500 font-mono">Score {item.score}/100</span>
-                      <button
-                        onClick={() => onJumpToMessage(item.sourceMessageId)}
-                        className="text-[11px] text-brand-400 hover:text-brand-300 flex items-center space-x-1 bg-surface-subtle border border-surface-border px-2 py-0.5 rounded hover:border-brand-500/40 transition-colors"
-                        title="Jump to original message in chat"
-                      >
-                        <span>Evidence</span>
-                        <ArrowRight className="w-2.5 h-2.5" />
-                      </button>
+                    <h4 className="text-xs font-medium text-primary">
+                      {item.title}
+                    </h4>
+
+                    {item.description && (
+                      <p className="text-[11px] text-secondary line-clamp-2">
+                        {item.description}
+                      </p>
+                    )}
+
+                    <div className="text-[11px] text-muted bg-surface-secondary rounded px-2 py-1 border border-border/70 flex items-center space-x-1.5">
+                      <span className="font-medium text-secondary">Why prioritized:</span>
+                      <span className="text-primary truncate">{item.reason}</span>
                     </div>
                   </div>
-
-                  <h4 className="text-sm font-medium text-slate-100 mb-1 group-hover:text-brand-300 transition-colors">
-                    {item.title}
-                  </h4>
-                  {item.description && (
-                    <p className="text-xs text-slate-400 mb-2 line-clamp-2">
-                      {item.description}
-                    </p>
-                  )}
-
-                  {/* Explainable Reasoning Badge */}
-                  <div className="text-[11px] text-slate-400 bg-surface/80 rounded px-2.5 py-1 border border-surface-border/60 flex items-center space-x-1.5">
-                    <span className="text-slate-500 font-medium">Why prioritized:</span>
-                    <span className="text-slate-300">{item.reason}</span>
-                  </div>
-                </div>
-              ))
+                );
+              })
             )}
           </div>
         </div>
 
-        {/* Sidebar: Key Developments & Topic Clusters */}
-        <div className="space-y-6">
-          {/* Important Developments */}
-          <div className="bg-surface-card border border-surface-border rounded-xl p-5 space-y-3">
-            <h3 className="text-xs font-semibold text-slate-300 uppercase tracking-wider flex items-center space-x-2">
-              <Award className="w-3.5 h-3.5 text-brand-400" />
+        {/* Right Column: Developments, Topics, and Recent Chats */}
+        <div className="space-y-4">
+          {/* Key Developments */}
+          <div className="bg-surface-card border border-border rounded-md p-4 space-y-2.5">
+            <h3 className="text-xs font-semibold text-primary uppercase tracking-wider flex items-center space-x-1.5">
+              <Award className="w-3.5 h-3.5 text-accent" />
               <span>Key Developments</span>
             </h3>
             <div className="space-y-2">
               {analysis?.summary?.importantDevelopments && analysis.summary.importantDevelopments.length > 0 ? (
                 analysis.summary.importantDevelopments.map((dev, idx) => (
-                  <div key={idx} className="text-xs text-slate-300 flex items-start space-x-2">
-                    <span className="w-1.5 h-1.5 rounded-full bg-brand-400 mt-1.5 flex-shrink-0" />
+                  <div key={idx} className="text-xs text-secondary flex items-start space-x-2">
+                    <span className="w-1 h-1 rounded-full bg-accent mt-1.5 flex-shrink-0" />
                     <span className="leading-relaxed">{dev}</span>
                   </div>
                 ))
               ) : (
-                <p className="text-xs text-slate-500">No major developments tagged yet.</p>
+                <p className="text-xs text-muted">No developments tagged yet.</p>
               )}
             </div>
           </div>
 
-          {/* Key Topics */}
-          <div className="bg-surface-card border border-surface-border rounded-xl p-5 space-y-3">
-            <h3 className="text-xs font-semibold text-slate-300 uppercase tracking-wider flex items-center space-x-2">
-              <MessageSquare className="w-3.5 h-3.5 text-brand-400" />
+          {/* Discussion Topics */}
+          <div className="bg-surface-card border border-border rounded-md p-4 space-y-2.5">
+            <h3 className="text-xs font-semibold text-primary uppercase tracking-wider flex items-center space-x-1.5">
+              <MessageSquare className="w-3.5 h-3.5 text-accent" />
               <span>Discussion Topics</span>
             </h3>
-            <div className="space-y-2.5">
+            <div className="space-y-2">
               {analysis?.summary?.keyTopics && analysis.summary.keyTopics.length > 0 ? (
                 analysis.summary.keyTopics.map((topic, idx) => (
-                  <div key={idx} className="bg-surface/50 border border-surface-border/80 rounded-lg p-2.5">
-                    <div className="flex items-center justify-between mb-1">
-                      <span className="text-xs font-semibold text-slate-200">{topic.topic}</span>
-                      <span className="text-[10px] text-slate-400 bg-surface px-1.5 py-0.5 rounded border border-surface-border">
+                  <div key={idx} className="bg-surface-secondary border border-border/80 rounded p-2">
+                    <div className="flex items-center justify-between mb-0.5">
+                      <span className="text-xs font-medium text-primary">{topic.topic}</span>
+                      <span className="text-[10px] font-mono text-muted bg-surface-card px-1 py-0.2 rounded border border-border">
                         {topic.messageCount} msgs
                       </span>
                     </div>
-                    <p className="text-[11px] text-slate-400">{topic.summary}</p>
+                    <p className="text-[11px] text-muted">{topic.summary}</p>
                   </div>
                 ))
               ) : (
-                <p className="text-xs text-slate-500">No specific topics clustered.</p>
+                <p className="text-xs text-muted">No topics clustered.</p>
               )}
             </div>
           </div>
 
-          {/* Chronological Recap */}
-          <div className="bg-surface-card border border-surface-border rounded-xl p-5 space-y-3">
-            <h3 className="text-xs font-semibold text-slate-300 uppercase tracking-wider flex items-center space-x-2">
-              <Calendar className="w-3.5 h-3.5 text-brand-400" />
+          {/* Chronological Flow */}
+          <div className="bg-surface-card border border-border rounded-md p-4 space-y-2.5">
+            <h3 className="text-xs font-semibold text-primary uppercase tracking-wider flex items-center space-x-1.5">
+              <Calendar className="w-3.5 h-3.5 text-accent" />
               <span>Chronological Flow</span>
             </h3>
             <div className="space-y-2">
               {analysis?.summary?.chronologicalRecap && analysis.summary.chronologicalRecap.length > 0 ? (
                 analysis.summary.chronologicalRecap.map((phase, idx) => (
-                  <div key={idx} className="border-l-2 border-brand-500/40 pl-3 py-1 space-y-0.5">
-                    <span className="text-[10px] text-brand-400 font-mono font-medium">{phase.timeRange}</span>
-                    <p className="text-xs text-slate-300">{phase.summary}</p>
+                  <div key={idx} className="border-l border-accent/60 pl-2.5 py-0.5 space-y-0.5">
+                    <span className="text-[10px] text-accent font-mono">{phase.timeRange}</span>
+                    <p className="text-[11px] text-secondary">{phase.summary}</p>
                   </div>
                 ))
               ) : (
-                <p className="text-xs text-slate-500">No chronological recap generated.</p>
+                <p className="text-xs text-muted">No flow available.</p>
               )}
             </div>
           </div>
+
+          {/* Recent Conversations Card */}
+          {conversations.length > 1 && (
+            <div className="bg-surface-card border border-border rounded-md p-4 space-y-2">
+              <h3 className="text-xs font-semibold text-primary uppercase tracking-wider">
+                Switch Conversation
+              </h3>
+              <div className="space-y-1">
+                {conversations.map((c) => (
+                  <button
+                    key={c.id}
+                    onClick={() => onSelectConversation(c.id)}
+                    className={`w-full text-left px-2 py-1.5 rounded text-xs flex items-center justify-between transition-colors ${
+                      c.id === conversation.id
+                        ? 'bg-accent-soft text-primary font-medium'
+                        : 'text-secondary hover:text-primary hover:bg-surface-hover'
+                    }`}
+                  >
+                    <span className="truncate pr-2">{c.title}</span>
+                    <span className="text-[10px] font-mono text-muted">{c.messageCount} msgs</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </div>

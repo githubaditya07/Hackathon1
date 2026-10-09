@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { Conversation, AnalysisResult, UserPreferences, UserActionStatus } from './types';
-import { Header } from './components/Header';
+import { Sidebar } from './components/Sidebar';
+import { Topbar } from './components/Topbar';
 import { Dashboard } from './components/Dashboard';
 import { ActionCenter } from './components/ActionCenter';
 import { MessageExplorer } from './components/MessageExplorer';
@@ -39,6 +40,34 @@ export const App: React.FC = () => {
   const [isImportModalOpen, setIsImportModalOpen] = useState(false);
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
   const [isWelcomeModalOpen, setIsWelcomeModalOpen] = useState(false);
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+
+  // Apply theme class to document element whenever preferences change
+  useEffect(() => {
+    const root = document.documentElement;
+    if (preferences.theme === 'dark') {
+      root.classList.add('dark');
+    } else {
+      root.classList.remove('dark');
+    }
+  }, [preferences.theme]);
+
+  // Run on-device analysis
+  const runAnalysis = useCallback(
+    async (conv: Conversation, prefs: UserPreferences) => {
+      setIsAnalyzing(true);
+      try {
+        const result = await analyzeConversation(conv, prefs, analysis);
+        setAnalysis(result);
+        await saveAnalysis(result);
+      } catch (err) {
+        console.error('Analysis failed:', err);
+      } finally {
+        setIsAnalyzing(false);
+      }
+    },
+    [analysis]
+  );
 
   // Initialize application data from local IndexedDB
   useEffect(() => {
@@ -59,7 +88,6 @@ export const App: React.FC = () => {
           if (cachedAnalysis) {
             setAnalysis(cachedAnalysis);
           } else {
-            // Auto-analyze
             runAnalysis(list[0], storedPrefs);
           }
         } else {
@@ -71,7 +99,7 @@ export const App: React.FC = () => {
       }
     }
     init();
-  }, []);
+  }, [runAnalysis]);
 
   // When active conversation changes, load its analysis
   useEffect(() => {
@@ -88,26 +116,17 @@ export const App: React.FC = () => {
       }
     }
     loadConvData();
-  }, [activeConversationId]);
+  }, [activeConversationId, conversations, preferences, runAnalysis]);
 
   const activeConversation = conversations.find(c => c.id === activeConversationId) || null;
 
-  // Run on-device analysis
-  const runAnalysis = useCallback(
-    async (conv: Conversation, prefs: UserPreferences) => {
-      setIsAnalyzing(true);
-      try {
-        const result = await analyzeConversation(conv, prefs, analysis);
-        setAnalysis(result);
-        await saveAnalysis(result);
-      } catch (err) {
-        console.error('Analysis failed:', err);
-      } finally {
-        setIsAnalyzing(false);
-      }
-    },
-    [analysis]
-  );
+  // Toggle Theme
+  const handleToggleTheme = useCallback(async () => {
+    const nextTheme = preferences.theme === 'dark' ? 'light' : 'dark';
+    const updated: UserPreferences = { ...preferences, theme: nextTheme };
+    setPreferences(updated);
+    await saveUserPreferences(updated);
+  }, [preferences]);
 
   // Load Built-in Demo Conversation
   const handleLoadDemo = useCallback(async () => {
@@ -186,7 +205,6 @@ export const App: React.FC = () => {
       setPreferences(updated);
       await saveUserPreferences(updated);
       if (activeConversation) {
-        // Re-analyze with new name / aliases
         runAnalysis(activeConversation, updated);
       }
     },
@@ -194,69 +212,93 @@ export const App: React.FC = () => {
   );
 
   return (
-    <div className="min-h-screen flex flex-col bg-background text-slate-100 font-sans selection:bg-brand-500/30 selection:text-brand-100">
-      {/* Top Header */}
-      <Header
+    <div className="min-h-screen flex bg-background text-primary antialiased font-sans">
+      {/* Restrained Sidebar */}
+      <Sidebar
         conversations={conversations}
         activeConversationId={activeConversationId}
         onSelectConversation={(id) => setActiveConversationId(id)}
         activeTab={activeTab}
-        onSelectTab={(tab) => {
+        onSelectTab={(tab, filter) => {
           setActiveTab(tab);
-          if (tab === 'actions') setActionCategoryFilter('all');
+          if (filter) setActionCategoryFilter(filter);
+          else if (tab === 'actions') setActionCategoryFilter('all');
         }}
-        onOpenImport={() => setIsImportModalOpen(true)}
-        onLoadDemo={handleLoadDemo}
-        onOpenSettings={() => setIsSettingsModalOpen(true)}
         urgentCount={analysis?.stats?.urgentCount || 0}
+        taskCount={analysis?.stats?.taskCount || 0}
+        deadlineCount={analysis?.stats?.imminentDeadlineCount || 0}
+        preferences={preferences}
+        onToggleTheme={handleToggleTheme}
+        onOpenImport={() => setIsImportModalOpen(true)}
+        onOpenSettings={() => setIsSettingsModalOpen(true)}
+        isOpenMobile={isMobileSidebarOpen}
+        onCloseMobile={() => setIsMobileSidebarOpen(false)}
       />
 
       {/* Main Content Area */}
-      <main className="flex-1 pb-16">
-        {activeTab === 'dashboard' && (
-          <Dashboard
-            conversation={activeConversation}
-            analysis={analysis}
-            preferences={preferences}
-            onAnalyze={() => activeConversation && runAnalysis(activeConversation, preferences)}
-            isAnalyzing={isAnalyzing}
-            onNavigateToAction={handleNavigateToAction}
-            onJumpToMessage={handleJumpToMessage}
-            onOpenImport={() => setIsImportModalOpen(true)}
-            onLoadDemo={handleLoadDemo}
-          />
-        )}
+      <div className="flex-1 flex flex-col min-w-0">
+        {/* Top Navigation Bar */}
+        <Topbar
+          activeTab={activeTab}
+          conversations={conversations}
+          activeConversationId={activeConversationId}
+          onSelectConversation={(id) => setActiveConversationId(id)}
+          onOpenMobileSidebar={() => setIsMobileSidebarOpen(true)}
+          onOpenImport={() => setIsImportModalOpen(true)}
+          onLoadDemo={handleLoadDemo}
+          preferences={preferences}
+          onToggleTheme={handleToggleTheme}
+        />
 
-        {activeTab === 'actions' && (
-          <ActionCenter
-            analysis={analysis}
-            preferences={preferences}
-            itemActions={itemActions}
-            onUpdateItemAction={handleUpdateItemAction}
-            onJumpToMessage={handleJumpToMessage}
-            initialFilter={actionCategoryFilter}
-          />
-        )}
+        {/* View Router */}
+        <main className="flex-1 overflow-y-auto pb-12">
+          {activeTab === 'dashboard' && (
+            <Dashboard
+              conversation={activeConversation}
+              conversations={conversations}
+              onSelectConversation={(id) => setActiveConversationId(id)}
+              analysis={analysis}
+              preferences={preferences}
+              onAnalyze={() => activeConversation && runAnalysis(activeConversation, preferences)}
+              isAnalyzing={isAnalyzing}
+              onNavigateToAction={handleNavigateToAction}
+              onJumpToMessage={handleJumpToMessage}
+              onOpenImport={() => setIsImportModalOpen(true)}
+              onLoadDemo={handleLoadDemo}
+            />
+          )}
 
-        {activeTab === 'explorer' && (
-          <MessageExplorer
-            conversation={activeConversation}
-            analysis={analysis}
-            highlightedMessageId={highlightedMessageId}
-            onClearHighlight={() => setHighlightedMessageId(null)}
-          />
-        )}
+          {activeTab === 'actions' && (
+            <ActionCenter
+              analysis={analysis}
+              preferences={preferences}
+              itemActions={itemActions}
+              onUpdateItemAction={handleUpdateItemAction}
+              onJumpToMessage={handleJumpToMessage}
+              initialFilter={actionCategoryFilter}
+            />
+          )}
 
-        {activeTab === 'privacy' && (
-          <PrivacyCenter
-            conversation={activeConversation}
-            analysis={analysis}
-            preferences={preferences}
-            onDeleteCurrentConversation={handleDeleteCurrentConversation}
-            onClearAllData={handleClearAllData}
-          />
-        )}
-      </main>
+          {activeTab === 'explorer' && (
+            <MessageExplorer
+              conversation={activeConversation}
+              analysis={analysis}
+              highlightedMessageId={highlightedMessageId}
+              onClearHighlight={() => setHighlightedMessageId(null)}
+            />
+          )}
+
+          {activeTab === 'privacy' && (
+            <PrivacyCenter
+              conversation={activeConversation}
+              analysis={analysis}
+              preferences={preferences}
+              onDeleteCurrentConversation={handleDeleteCurrentConversation}
+              onClearAllData={handleClearAllData}
+            />
+          )}
+        </main>
+      </div>
 
       {/* Modals */}
       <ImportModal

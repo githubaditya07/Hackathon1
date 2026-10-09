@@ -9,6 +9,7 @@ import {
   AlertTriangle,
   Award,
   HelpCircle,
+  X,
 } from 'lucide-react';
 import { Conversation, AnalysisResult } from '../types';
 
@@ -95,7 +96,7 @@ export const MessageExplorer: React.FC<MessageExplorerProps> = ({
 
   if (!conversation) {
     return (
-      <div className="max-w-4xl mx-auto py-16 text-center text-slate-400">
+      <div className="max-w-3xl mx-auto py-20 text-center text-muted text-xs">
         No conversation loaded to explore.
       </div>
     );
@@ -114,59 +115,44 @@ export const MessageExplorer: React.FC<MessageExplorerProps> = ({
     return true;
   });
 
-  // Sender color hash
-  const getSenderColor = (sender: string) => {
-    const colors = [
-      'from-indigo-500 to-purple-600',
-      'from-emerald-500 to-teal-600',
-      'from-blue-500 to-cyan-600',
-      'from-amber-500 to-orange-600',
-      'from-rose-500 to-pink-600',
-    ];
-    let hash = 0;
-    for (let i = 0; i < sender.length; i++) hash += sender.charCodeAt(i);
-    return colors[Math.abs(hash) % colors.length];
-  };
-
   return (
-    <div className="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6 animate-fade-in">
-      {/* Header & Filter Controls */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-surface-border pb-5">
+    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-6 space-y-4 animate-fade-in">
+      {/* Header & Controls */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 pb-4 border-b border-border">
         <div>
-          <h1 className="text-2xl font-bold text-white tracking-tight flex items-center space-x-2">
-            <Users className="w-6 h-6 text-brand-400" />
-            <span>Message Explorer</span>
-          </h1>
-          <p className="text-xs text-slate-400 mt-1">
-            Searchable full chat timeline with direct evidence highlighting and source verification.
+          <h2 className="text-lg font-semibold text-primary tracking-tight">
+            Conversation Explorer
+          </h2>
+          <p className="text-xs text-muted mt-0.5">
+            Full chronological chat timeline with tagged intelligence citations.
           </p>
         </div>
 
         {/* Filter controls */}
-        <div className="flex items-center space-x-3 flex-wrap gap-y-2">
-          {/* Search bar */}
+        <div className="flex items-center space-x-2 flex-wrap gap-y-2">
+          {/* Search */}
           <div className="relative">
-            <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+            <Search className="w-3.5 h-3.5 text-muted absolute left-2.5 top-1/2 -translate-y-1/2" />
             <input
               type="text"
-              placeholder="Search chat messages..."
+              placeholder="Search chat..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-8 pr-3 py-1.5 bg-surface border border-surface-border rounded-lg text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-brand-500 w-44 sm:w-56"
+              className="pl-8 pr-3 py-1 bg-surface-card border border-border rounded-md text-xs text-primary placeholder-muted focus:outline-none focus:border-accent w-36 sm:w-48"
             />
           </div>
 
-          {/* Sender Filter */}
-          <div className="flex items-center space-x-1.5 bg-surface border border-surface-border rounded-lg px-2.5 py-1.5 text-xs text-slate-300">
-            <Filter className="w-3.5 h-3.5 text-slate-400" />
+          {/* Sender filter */}
+          <div className="flex items-center space-x-1 bg-surface-card border border-border rounded-md px-2 py-1 text-xs text-secondary">
+            <Filter className="w-3 h-3 text-muted" />
             <select
               value={selectedSender}
               onChange={(e) => setSelectedSender(e.target.value)}
-              className="bg-transparent focus:outline-none cursor-pointer text-slate-200 text-xs font-medium"
+              className="bg-transparent focus:outline-none cursor-pointer text-primary text-xs font-medium"
             >
-              <option value="all" className="bg-surface">All Senders ({conversation.senders.length})</option>
+              <option value="all" className="bg-surface-card">All Senders ({conversation.senders.length})</option>
               {conversation.senders.map((s) => (
-                <option key={s} value={s} className="bg-surface">{s}</option>
+                <option key={s} value={s} className="bg-surface-card">{s}</option>
               ))}
             </select>
           </div>
@@ -174,39 +160,40 @@ export const MessageExplorer: React.FC<MessageExplorerProps> = ({
           {/* Insights Only Toggle */}
           <button
             onClick={() => setOnlyInsights(!onlyInsights)}
-            className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
+            className={`flex items-center space-x-1 px-2.5 py-1 rounded-md text-xs font-medium border transition-colors ${
               onlyInsights
-                ? 'bg-brand-500/15 border-brand-500/30 text-brand-300'
-                : 'bg-surface border-surface-border text-slate-400 hover:text-slate-200'
+                ? 'bg-accent-soft border-accent text-accent'
+                : 'bg-surface-card border-border text-muted hover:text-primary'
             }`}
           >
-            <Sparkles className="w-3 h-3 text-brand-400" />
-            <span>Tagged Insights Only</span>
+            <Sparkles className="w-3 h-3 text-accent" />
+            <span>Insights Only</span>
           </button>
         </div>
       </div>
 
-      {/* Highlight active alert if navigating from an action */}
+      {/* Focus Alert if navigated from evidence link */}
       {highlightedMessageId && (
-        <div className="bg-brand-500/10 border border-brand-500/30 rounded-xl p-3 flex items-center justify-between text-xs text-brand-300">
+        <div className="bg-accent-soft border border-accent/40 rounded-md p-2.5 flex items-center justify-between text-xs text-primary">
           <div className="flex items-center space-x-2">
-            <Sparkles className="w-4 h-4 text-brand-400 animate-spin" />
-            <span>Inspecting source evidence for message <strong>{highlightedMessageId}</strong></span>
+            <span className="w-2 h-2 rounded-full bg-accent animate-pulse" />
+            <span>Inspecting source evidence: Message <code className="font-mono font-semibold">{highlightedMessageId}</code></span>
           </div>
           <button
             onClick={onClearHighlight}
-            className="text-[11px] underline hover:text-white"
+            className="text-muted hover:text-primary p-0.5 rounded"
+            title="Clear highlight"
           >
-            Clear focus
+            <X className="w-3.5 h-3.5" />
           </button>
         </div>
       )}
 
-      {/* Messages Timeline */}
-      <div className="space-y-3">
+      {/* Timeline */}
+      <div className="space-y-2">
         {filteredMessages.length === 0 ? (
-          <div className="bg-surface-card border border-surface-border rounded-xl p-12 text-center text-slate-400 text-xs">
-            No messages matched your current filters.
+          <div className="bg-surface-card border border-border rounded-md p-10 text-center text-xs text-muted">
+            No messages matched your current search or filters.
           </div>
         ) : (
           filteredMessages.map((msg) => {
@@ -217,66 +204,64 @@ export const MessageExplorer: React.FC<MessageExplorerProps> = ({
               <div
                 key={msg.id}
                 ref={(el) => (messageRefs.current[msg.id] = el)}
-                className={`bg-surface-card border rounded-xl p-4 transition-all ${
+                className={`bg-surface-card border rounded-md p-3.5 transition-colors ${
                   isHighlighted
-                    ? 'highlight-source-message ring-2 ring-brand-500 shadow-xl'
+                    ? 'highlight-source-message ring-1 ring-accent'
                     : insights.length > 0
-                    ? 'border-surface-border hover:border-slate-600'
-                    : 'border-surface-border/60 hover:border-surface-border'
+                    ? 'border-border hover:border-secondary'
+                    : 'border-border/60 hover:border-border'
                 }`}
               >
-                {/* Header row: Sender avatar, name, time */}
-                <div className="flex items-center justify-between mb-2">
-                  <div className="flex items-center space-x-2.5">
-                    <div
-                      className={`w-7 h-7 rounded-lg bg-gradient-to-tr ${getSenderColor(
-                        msg.sender
-                      )} flex items-center justify-center text-white text-xs font-bold shadow-sm`}
-                    >
+                {/* Header row: Sender name, You badge, timestamp */}
+                <div className="flex items-center justify-between mb-1.5">
+                  <div className="flex items-center space-x-2">
+                    <span className="w-6 h-6 rounded bg-surface-secondary text-secondary flex items-center justify-center text-xs font-mono font-semibold">
                       {msg.sender.charAt(0).toUpperCase()}
-                    </div>
-                    <span className="font-semibold text-sm text-slate-200">{msg.sender}</span>
+                    </span>
+                    <span className="font-semibold text-xs text-primary">{msg.sender}</span>
                     {msg.isUserSender && (
-                      <span className="px-1.5 py-0.2 rounded text-[10px] font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+                      <span className="px-1 py-0.2 rounded text-[10px] font-mono bg-accent-soft text-accent border border-accent/20">
                         You
                       </span>
                     )}
                   </div>
 
-                  <div className="flex items-center space-x-2 text-[11px] text-slate-500 font-mono">
-                    <Clock className="w-3 h-3 text-slate-500" />
-                    <span>{new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                  <div className="flex items-center space-x-1.5 text-[11px] font-mono text-muted">
+                    <Clock className="w-3 h-3 text-muted" />
+                    <span>
+                      {new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                    </span>
                   </div>
                 </div>
 
-                {/* Message Body (Safe text rendered, no unsafe HTML) */}
-                <p className="text-sm text-slate-300 leading-relaxed whitespace-pre-wrap font-sans pl-9">
+                {/* Message body (safe text) */}
+                <p className="text-xs text-primary leading-relaxed whitespace-pre-wrap font-sans pl-8">
                   {msg.text}
                 </p>
 
-                {/* Attached Insights Badges */}
+                {/* Attached Insight Citations */}
                 {insights.length > 0 && (
-                  <div className="mt-3 pl-9 flex items-center space-x-2 flex-wrap gap-y-1.5">
+                  <div className="mt-2.5 pl-8 flex items-center space-x-1.5 flex-wrap gap-y-1">
                     {insights.map((ins, i) => (
                       <span
                         key={i}
-                        className={`inline-flex items-center space-x-1.5 px-2.5 py-1 rounded-md text-[11px] font-medium border ${
+                        className={`inline-flex items-center space-x-1 px-2 py-0.5 rounded text-[10px] font-mono border ${
                           ins.type === 'task'
-                            ? 'bg-amber-500/10 text-amber-300 border-amber-500/20'
+                            ? 'bg-semantic-important-bg text-semantic-important border-semantic-important-border'
                             : ins.type === 'deadline'
-                            ? 'bg-red-500/10 text-red-300 border-red-500/20'
+                            ? 'bg-semantic-urgent-bg text-semantic-urgent border-semantic-urgent-border'
                             : ins.type === 'decision'
-                            ? 'bg-emerald-500/10 text-emerald-300 border-emerald-500/20'
+                            ? 'bg-semantic-success-bg text-semantic-success border-semantic-success-border'
                             : ins.type === 'mention'
-                            ? 'bg-indigo-500/10 text-indigo-300 border-indigo-500/20'
-                            : 'bg-blue-500/10 text-blue-300 border-blue-500/20'
+                            ? 'bg-accent-soft text-accent border-accent/30'
+                            : 'bg-semantic-info-bg text-semantic-info border-semantic-info-border'
                         }`}
                       >
-                        {ins.type === 'task' && <CheckCircle2 className="w-3 h-3" />}
-                        {ins.type === 'deadline' && <AlertTriangle className="w-3 h-3" />}
-                        {ins.type === 'decision' && <Award className="w-3 h-3" />}
-                        {ins.type === 'mention' && <Users className="w-3 h-3" />}
-                        {ins.type === 'question' && <HelpCircle className="w-3 h-3" />}
+                        {ins.type === 'task' && <CheckCircle2 className="w-2.5 h-2.5" />}
+                        {ins.type === 'deadline' && <AlertTriangle className="w-2.5 h-2.5" />}
+                        {ins.type === 'decision' && <Award className="w-2.5 h-2.5" />}
+                        {ins.type === 'mention' && <Users className="w-2.5 h-2.5" />}
+                        {ins.type === 'question' && <HelpCircle className="w-2.5 h-2.5" />}
                         <span>{ins.label}</span>
                       </span>
                     ))}

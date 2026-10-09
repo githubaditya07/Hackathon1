@@ -42,77 +42,77 @@ export const WelcomeModal: React.FC<WelcomeModalProps> = ({
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-md animate-fade-in">
-      <div className="bg-surface-card border border-surface-border rounded-2xl w-full max-w-xl overflow-hidden shadow-2xl space-y-6 p-6 sm:p-8">
-        {/* Brand Hero */}
-        <div className="text-center space-y-3">
-          <div className="w-14 h-14 rounded-2xl bg-gradient-to-tr from-brand-600 to-indigo-400 flex items-center justify-center shadow-xl shadow-brand-500/25 ring-1 ring-brand-400/40 mx-auto">
-            <Sparkles className="w-7 h-7 text-white" />
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-xs animate-fade-in">
+      <div className="bg-surface-card border border-border rounded-lg w-full max-w-lg overflow-hidden shadow-card p-6 space-y-5">
+        {/* Brand Header */}
+        <div className="text-center space-y-2">
+          <div className="w-10 h-10 rounded-md bg-accent flex items-center justify-center text-white mx-auto shadow-subtle">
+            <Sparkles className="w-5 h-5 text-white" />
           </div>
-          <h2 className="text-2xl font-extrabold text-white tracking-tight">
+          <h2 className="text-lg font-semibold text-primary tracking-tight">
             Welcome to UNREAD
           </h2>
-          <p className="text-sm text-slate-300 max-w-md mx-auto">
-            “Catch up on what matters. Skip what doesn't.”
+          <p className="text-xs text-secondary max-w-sm mx-auto">
+            Catch up on what matters in overwhelming conversations. Skip what doesn't.
           </p>
         </div>
 
         {/* Local Privacy Pledge */}
-        <div className="bg-emerald-950/20 border border-emerald-500/30 rounded-xl p-4 flex items-start space-x-3 text-xs text-slate-300">
-          <ShieldCheck className="w-5 h-5 text-emerald-400 flex-shrink-0 mt-0.5" />
-          <div className="space-y-1">
-            <strong className="text-emerald-300 block font-semibold">100% On-Device Local Processing</strong>
-            <span>
-              Your chats never leave your browser. All parsing, entity extraction, deadline math, and priority scoring run locally with zero network calls.
+        <div className="bg-surface-secondary border border-border rounded-md p-3 flex items-start space-x-2.5 text-xs text-secondary">
+          <ShieldCheck className="w-4 h-4 text-semantic-success flex-shrink-0 mt-0.5" />
+          <div>
+            <strong className="text-primary font-medium block">100% On-Device Processing</strong>
+            <span className="text-[11px] text-muted">
+              Your conversations never leave this machine. All text parsing, deadline math, and priority scoring run locally.
             </span>
           </div>
         </div>
 
         {/* Personalization */}
-        <div className="space-y-3 bg-surface p-4 rounded-xl border border-surface-border">
-          <h4 className="text-xs font-semibold text-slate-200 uppercase tracking-wider">
-            Personalize Your Catch-up
-          </h4>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs">
+        <div className="space-y-2.5 bg-surface-secondary p-3.5 rounded-md border border-border text-xs">
+          <span className="text-[10px] font-mono uppercase tracking-wider text-muted font-semibold block">
+            Personalize Your Briefing
+          </span>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
             <div>
-              <label className="text-slate-400 block mb-1">Your Name</label>
+              <label className="text-secondary block mb-0.5 font-medium">Your Name</label>
               <input
                 type="text"
                 value={userName}
                 onChange={(e) => setUserName(e.target.value)}
                 placeholder="Alex"
-                className="w-full bg-surface-card border border-surface-border rounded-lg px-3 py-1.5 text-slate-200 focus:outline-none focus:border-brand-500"
+                className="w-full bg-surface-card border border-border rounded px-2.5 py-1 text-primary focus:outline-none focus:border-accent text-xs"
               />
             </div>
             <div>
-              <label className="text-slate-400 block mb-1">Aliases (e.g. Alex, Adi)</label>
+              <label className="text-secondary block mb-0.5 font-medium">Aliases (e.g. Alex, Adi)</label>
               <input
                 type="text"
                 value={aliases}
                 onChange={(e) => setAliases(e.target.value)}
                 placeholder="Alex, Aditya, akg"
-                className="w-full bg-surface-card border border-surface-border rounded-lg px-3 py-1.5 text-slate-200 focus:outline-none focus:border-brand-500"
+                className="w-full bg-surface-card border border-border rounded px-2.5 py-1 text-primary focus:outline-none focus:border-accent text-xs"
               />
             </div>
           </div>
         </div>
 
-        {/* Quick Launch Buttons */}
-        <div className="space-y-2 pt-2">
+        {/* Launch Buttons */}
+        <div className="space-y-2 pt-1">
           <button
             onClick={() => handleStart('demo')}
-            className="w-full py-3 px-4 rounded-xl bg-brand-600 hover:bg-brand-500 text-white font-semibold text-sm shadow-lg shadow-brand-500/25 transition-all flex items-center justify-center space-x-2 group hover:scale-[1.01] active:scale-[0.99]"
+            className="w-full py-2 px-3 rounded-md bg-accent hover:bg-accent-hover text-white font-medium text-xs shadow-subtle transition-colors flex items-center justify-center space-x-1.5"
           >
-            <PlayCircle className="w-4 h-4 text-white group-hover:scale-110 transition-transform" />
+            <PlayCircle className="w-4 h-4" />
             <span>Load Demo Conversation (Hackathon Sprint)</span>
           </button>
 
           <button
             onClick={() => handleStart('import')}
-            className="w-full py-2.5 px-4 rounded-xl bg-surface border border-surface-border hover:bg-surface-hover text-slate-300 font-semibold text-xs transition-colors flex items-center justify-center space-x-2"
+            className="w-full py-1.5 px-3 rounded-md bg-surface-card border border-border hover:bg-surface-hover text-secondary hover:text-primary font-medium text-xs transition-colors flex items-center justify-center space-x-1.5"
           >
-            <Upload className="w-4 h-4 text-slate-400" />
-            <span>Import Your Own Conversation File (.txt / .json)</span>
+            <Upload className="w-3.5 h-3.5 text-muted" />
+            <span>Import Chat Export File (.txt / .json)</span>
           </button>
         </div>
       </div>

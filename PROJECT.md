@@ -263,10 +263,92 @@ add a project md which has all my prompts also it carries marks
 
 ---
 
+### PROMPT 3: Complete UI Redesign — Modern Greige (Stone × Graphite × Muted Sage)
+```markdown
+# UNREAD — COMPLETE UI REDESIGN: MODERN GREIGE
+## Design System: Stone × Graphite × Muted Sage
+
+Act as a senior product designer and frontend engineer. Redesign the existing UNREAD application using a sophisticated Modern Greige — Stone & Graphite visual identity.
+The application is an AI-powered, local-first conversation intelligence tool that helps users catch up on unread messages, discover important decisions, identify action items, and prioritize deadlines.
+The interface must feel like a premium developer productivity product: understated, technical, clean, confident, and exceptionally well-crafted.
+IMPORTANT: Modify the existing project in place. Preserve all working functionality, architecture, routes, data, AI processing, local-first privacy, and business logic. This is a design-system and UI implementation task, not a rewrite.
+
+## 1. COLOR SYSTEM
+Light theme:
+- Main background: #F5F4F0
+- Sidebar background: #ECEAE4
+- Primary card surface: #FFFFFF
+- Secondary surface: #EAE8E1
+- Borders and dividers: #D9D7CF
+- Primary text: #30322F
+- Secondary text: #74766F
+- Muted text: #92938C
+- Primary accent — muted sage: #788879
+- Accent hover: #657666
+- Soft accent background: #E4EAE2
+- Deep graphite: #373936
+
+Dark theme:
+- Main background: #20211F
+- Sidebar background: #252623
+- Primary card surface: #292A27
+- Secondary surface: #30312D
+- Borders and dividers: #3B3D37
+- Primary text: #ECEDE6
+- Secondary text: #B1B3AA
+- Muted text: #898C82
+- Primary accent — muted sage: #98AA96
+- Accent hover: #A9BBA7
+- Soft accent background: #343D33
+
+Semantic colors:
+- Urgent: muted brick red with a readable tinted background.
+- Important: restrained amber.
+- Informational: muted blue-gray.
+- Completed: muted green.
+- Error: accessible red.
+- Success: accessible green.
+
+## 2. DESIGN PHILOSOPHY
+- Minimal, not empty. Technical, not sterile. Premium, not flashy. Structured, not cluttered. Information-dense, but easy to scan. Consistent rather than decorative.
+- Avoid neon colors, excessive gradients, glassmorphism, oversized rounded cards everywhere, excessive shadows, excessive animation, random accent colors.
+
+## 3. TYPOGRAPHY
+- Clean, readable Inter font and JetBrains Mono for technical metadata.
+
+## 4. APPLICATION LAYOUT
+- Sidebar: UNREAD wordmark, Overview, Priority inbox, Tasks and deadlines, Decisions, Conversation explorer, Privacy settings, Theme toggle, User preferences.
+- Top navigation: Current page title, conversation selector, search, theme toggle, user preferences, contextual action.
+
+## 5. DASHBOARD REDESIGN
+- Overview metrics, Catch-up briefing, Priority list, Recent conversations.
+
+## 6. PRIORITY INBOX AND TASKS
+- Supports all insights, urgent items, my tasks, mentions, deadlines, decisions, unanswered questions. Distinguish pending, completed, uncertain.
+
+## 7. CONVERSATION EXPLORER
+- Search, sender filters, timestamp/sender labels, message grouping, subtle highlighting for referenced messages.
+
+## 8. MICRO-INTERACTIONS AND DETAILS
+- Subtle hover states, clear selected navigation, gentle transitions, accessible focus rings.
+
+## 9. DARK MODE
+- Fully designed dark theme with subtle separation, visible borders, muted sage accents. Local persistence of theme preference.
+
+## 10. RESPONSIVENESS AND ACCESSIBILITY
+- Desktop, tablet, mobile adaptation; keyboard navigation and high contrast.
+```
+
+---
+
 ## 🛠️ SECTION III: IMPLEMENTATION VERIFICATION MATRIX
 
 | Prompt Requirement | Implemented In File | Test Verification |
 | :--- | :--- | :--- |
+| **Modern Greige Design Tokens (Stone × Graphite × Sage)** | [`src/index.css`](file:///c:/Users/Aditya%20Kumar%20Gupta/Desktop/ProtocolX/Hackathon1/src/index.css), [`tailwind.config.js`](file:///c:/Users/Aditya%20Kumar%20Gupta/Desktop/ProtocolX/Hackathon1/tailwind.config.js) | Light `#F5F4F0` / Dark `#20211F` palette verified |
+| **Dynamic Light & Dark Theme Switching** | [`src/App.tsx`](file:///c:/Users/Aditya%20Kumar%20Gupta/Desktop/ProtocolX/Hackathon1/src/App.tsx), [`src/components/Sidebar.tsx`](file:///c:/Users/Aditya%20Kumar%20Gupta/Desktop/ProtocolX/Hackathon1/src/components/Sidebar.tsx) | Persisted in IndexedDB |
+| **Restrained Productivity Sidebar** | [`src/components/Sidebar.tsx`](file:///c:/Users/Aditya%20Kumar%20Gupta/Desktop/ProtocolX/Hackathon1/src/components/Sidebar.tsx) | [`src/test/components.test.tsx`](file:///c:/Users/Aditya%20Kumar%20Gupta/Desktop/ProtocolX/Hackathon1/src/test/components.test.tsx) (passing) |
+| **Modern Greige Topbar with Breadcrumbs** | [`src/components/Topbar.tsx`](file:///c:/Users/Aditya%20Kumar%20Gupta/Desktop/ProtocolX/Hackathon1/src/components/Topbar.tsx) | [`src/test/components.test.tsx`](file:///c:/Users/Aditya%20Kumar%20Gupta/Desktop/ProtocolX/Hackathon1/src/test/components.test.tsx) (passing) |
 | **Multi-format chat parser with multiline support** | [`src/lib/parser/chatParser.ts`](file:///c:/Users/Aditya%20Kumar%20Gupta/Desktop/ProtocolX/Hackathon1/src/lib/parser/chatParser.ts) | [`src/test/parser.test.ts`](file:///c:/Users/Aditya%20Kumar%20Gupta/Desktop/ProtocolX/Hackathon1/src/test/parser.test.ts) (6 passing tests) |
 | **Temporal date math anchored to message timestamps** | [`src/lib/nlp/dateResolver.ts`](file:///c:/Users/Aditya%20Kumar%20Gupta/Desktop/ProtocolX/Hackathon1/src/lib/nlp/dateResolver.ts) | [`src/test/nlp.test.ts`](file:///c:/Users/Aditya%20Kumar%20Gupta/Desktop/ProtocolX/Hackathon1/src/test/nlp.test.ts) (passing) |
 | **Action item & task extraction with ownership** | [`src/lib/nlp/taskExtractor.ts`](file:///c:/Users/Aditya%20Kumar%20Gupta/Desktop/ProtocolX/Hackathon1/src/lib/nlp/taskExtractor.ts) | [`src/test/nlp.test.ts`](file:///c:/Users/Aditya%20Kumar%20Gupta/Desktop/ProtocolX/Hackathon1/src/test/nlp.test.ts) (passing) |
@@ -278,8 +360,7 @@ add a project md which has all my prompts also it carries marks
 | **XSS sanitization & size bounds** | [`src/lib/security/sanitizer.ts`](file:///c:/Users/Aditya%20Kumar%20Gupta/Desktop/ProtocolX/Hackathon1/src/lib/security/sanitizer.ts) | [`src/test/nlp.test.ts`](file:///c:/Users/Aditya%20Kumar%20Gupta/Desktop/ProtocolX/Hackathon1/src/test/nlp.test.ts) (passing) |
 | **Executive briefing & thematic clusters** | [`src/lib/nlp/summarizer.ts`](file:///c:/Users/Aditya%20Kumar%20Gupta/Desktop/ProtocolX/Hackathon1/src/lib/nlp/summarizer.ts) | Integrated in [`src/test/integration.test.ts`](file:///c:/Users/Aditya%20Kumar%20Gupta/Desktop/ProtocolX/Hackathon1/src/test/integration.test.ts) |
 | **Realistic hackathon sprint demo dataset** | [`src/data/sampleConversation.ts`](file:///c:/Users/Aditya%20Kumar%20Gupta/Desktop/ProtocolX/Hackathon1/src/data/sampleConversation.ts) | [`src/test/integration.test.ts`](file:///c:/Users/Aditya%20Kumar%20Gupta/Desktop/ProtocolX/Hackathon1/src/test/integration.test.ts) (passing) |
-| **Interactive Linear/Raycast UI components** | [`src/components/`](file:///c:/Users/Aditya%20Kumar%20Gupta/Desktop/ProtocolX/Hackathon1/src/components/) | [`src/test/components.test.tsx`](file:///c:/Users/Aditya%20Kumar%20Gupta/Desktop/ProtocolX/Hackathon1/src/test/components.test.tsx) (passing) |
-| **Full build, test, and lint commands** | [`package.json`](file:///c:/Users/Aditya%20Kumar%20Gupta/Desktop/ProtocolX/Hackathon1/package.json) | Tested in CLI: 0 errors |
+| **Full build, test, and lint commands** | [`package.json`](file:///c:/Users/Aditya%20Kumar%20Gupta/Desktop/ProtocolX/Hackathon1/package.json) | Tested in CLI: 0 errors (21/21 tests pass) |
 
 ---
 

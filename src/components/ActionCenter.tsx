@@ -37,6 +37,11 @@ export const ActionCenter: React.FC<ActionCenterProps> = ({
   const [sortBy, setSortBy] = useState<'score' | 'time' | 'confidence'>('score');
   const [showDismissed, setShowDismissed] = useState(false);
 
+  // Synchronize when initialFilter prop changes from sidebar navigation
+  React.useEffect(() => {
+    if (initialFilter) setActiveTab(initialFilter);
+  }, [initialFilter]);
+
   // Collect and normalize all actionable items into a unified list
   const unifiedItems = useMemo(() => {
     if (!analysis) return [];
@@ -55,6 +60,7 @@ export const ActionCenter: React.FC<ActionCenterProps> = ({
       reason: string;
       isAssignedToUser?: boolean;
       taskStatus?: 'pending' | 'completed' | 'uncertain';
+      dueDate?: string;
     }> = [];
 
     // 1. Tasks
@@ -73,6 +79,7 @@ export const ActionCenter: React.FC<ActionCenterProps> = ({
         reason: t.reason,
         isAssignedToUser: t.isAssignedToUser,
         taskStatus: t.status,
+        dueDate: t.dueDate,
       });
     }
 
@@ -90,6 +97,7 @@ export const ActionCenter: React.FC<ActionCenterProps> = ({
         sender: d.sourceSender,
         messageId: d.sourceMessageId,
         reason: d.urgencyExplanation,
+        dueDate: d.dueDateRaw,
       });
     }
 
@@ -200,51 +208,52 @@ export const ActionCenter: React.FC<ActionCenterProps> = ({
   }, [unifiedItems, activeTab, searchQuery, sortBy, showDismissed, itemActions]);
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-6 animate-fade-in">
-      {/* Header bar */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-surface-border pb-5">
+    <div className="max-w-6xl mx-auto px-4 sm:px-6 py-6 space-y-5 animate-fade-in">
+      {/* Top Bar: Title & Search / Sort Controls */}
+      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 pb-4 border-b border-border">
         <div>
-          <h1 className="text-2xl font-bold text-white tracking-tight flex items-center space-x-2">
-            <CheckSquare className="w-6 h-6 text-brand-400" />
-            <span>Action Center</span>
-          </h1>
-          <p className="text-xs text-slate-400 mt-1">
-            Prioritized inbox of extracted tasks, deadlines, mentions, and key decisions.
+          <h2 className="text-lg font-semibold text-primary tracking-tight flex items-center space-x-2">
+            <span>Priority Inbox</span>
+          </h2>
+          <p className="text-xs text-muted mt-0.5">
+            Action items, deadlines, direct requests, and team decisions extracted from chat.
           </p>
         </div>
 
-        {/* Controls: Search & Sort */}
-        <div className="flex items-center space-x-3 flex-wrap gap-y-2">
+        {/* Controls */}
+        <div className="flex items-center space-x-2 flex-wrap gap-y-2">
+          {/* Search */}
           <div className="relative">
-            <Search className="w-3.5 h-3.5 text-slate-400 absolute left-3 top-1/2 -translate-y-1/2" />
+            <Search className="w-3.5 h-3.5 text-muted absolute left-2.5 top-1/2 -translate-y-1/2" />
             <input
               type="text"
-              placeholder="Search action items..."
+              placeholder="Filter items..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              className="pl-8 pr-3 py-1.5 bg-surface border border-surface-border rounded-lg text-xs text-slate-200 placeholder-slate-500 focus:outline-none focus:border-brand-500 w-48 sm:w-60"
+              className="pl-8 pr-3 py-1 bg-surface-card border border-border rounded-md text-xs text-primary placeholder-muted focus:outline-none focus:border-accent w-40 sm:w-52"
             />
           </div>
 
-          <div className="flex items-center space-x-1.5 bg-surface border border-surface-border rounded-lg px-2.5 py-1.5 text-xs text-slate-300">
-            <SlidersHorizontal className="w-3.5 h-3.5 text-slate-400" />
+          {/* Sort */}
+          <div className="flex items-center space-x-1 bg-surface-card border border-border rounded-md px-2 py-1 text-xs text-secondary">
+            <SlidersHorizontal className="w-3 h-3 text-muted" />
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as any)}
-              className="bg-transparent focus:outline-none cursor-pointer text-slate-200 text-xs font-medium"
+              className="bg-transparent focus:outline-none cursor-pointer text-primary text-xs font-medium"
             >
-              <option value="score" className="bg-surface">Sort by Urgency Score</option>
-              <option value="time" className="bg-surface">Sort by Recency</option>
-              <option value="confidence" className="bg-surface">Sort by Confidence</option>
+              <option value="score" className="bg-surface-card">Sort: Urgency</option>
+              <option value="time" className="bg-surface-card">Sort: Recency</option>
+              <option value="confidence" className="bg-surface-card">Sort: Confidence</option>
             </select>
           </div>
 
           <button
             onClick={() => setShowDismissed(!showDismissed)}
-            className={`px-3 py-1.5 rounded-lg text-xs font-medium border transition-colors ${
+            className={`px-2.5 py-1 rounded-md text-xs font-medium border transition-colors ${
               showDismissed
-                ? 'bg-brand-500/15 border-brand-500/30 text-brand-300'
-                : 'bg-surface border-surface-border text-slate-400 hover:text-slate-200'
+                ? 'bg-accent-soft border-accent text-accent'
+                : 'bg-surface-card border-border text-muted hover:text-primary'
             }`}
           >
             {showDismissed ? 'Hide Dismissed' : 'Show Dismissed'}
@@ -253,12 +262,12 @@ export const ActionCenter: React.FC<ActionCenterProps> = ({
       </div>
 
       {/* Filter Tabs */}
-      <div className="flex items-center space-x-2 overflow-x-auto pb-2 scrollbar-none">
+      <div className="flex items-center space-x-1.5 overflow-x-auto pb-1 scrollbar-none">
         {[
-          { id: 'all', label: 'All Items', count: counts.all, icon: CheckSquare },
-          { id: 'urgent', label: 'Urgent', count: counts.urgent, icon: AlertTriangle, highlight: true },
+          { id: 'all', label: 'All', count: counts.all, icon: CheckSquare },
+          { id: 'urgent', label: 'Urgent', count: counts.urgent, icon: AlertTriangle, isUrgent: true },
           { id: 'my_tasks', label: `My Tasks (${preferences.userName})`, count: counts.my_tasks, icon: CheckCircle },
-          { id: 'task', label: 'All Tasks', count: counts.task, icon: CheckSquare },
+          { id: 'task', label: 'Tasks', count: counts.task, icon: CheckSquare },
           { id: 'deadline', label: 'Deadlines', count: counts.deadline, icon: Clock },
           { id: 'mention', label: 'Mentions', count: counts.mention, icon: Users },
           { id: 'decision', label: 'Decisions', count: counts.decision, icon: Award },
@@ -270,19 +279,19 @@ export const ActionCenter: React.FC<ActionCenterProps> = ({
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center space-x-1.5 px-3 py-1.5 rounded-lg text-xs font-medium whitespace-nowrap transition-all ${
+              className={`flex items-center space-x-1.5 px-2.5 py-1 rounded-md text-xs font-medium whitespace-nowrap transition-colors ${
                 isActive
-                  ? 'bg-brand-500/15 text-brand-400 border border-brand-500/30 shadow-sm'
-                  : 'bg-surface-card border border-surface-border text-slate-400 hover:text-slate-200 hover:border-slate-600'
+                  ? 'bg-accent text-white shadow-subtle'
+                  : 'bg-surface-card border border-border text-secondary hover:text-primary hover:bg-surface-hover'
               }`}
             >
-              <Icon className={`w-3.5 h-3.5 ${tab.highlight && tab.count > 0 ? 'text-red-400' : ''}`} />
+              <Icon className="w-3 h-3" />
               <span>{tab.label}</span>
               <span
-                className={`text-[10px] px-1.5 py-0.2 rounded-full ${
+                className={`text-[10px] px-1 py-0.2 rounded font-mono ${
                   isActive
-                    ? 'bg-brand-500/30 text-brand-200'
-                    : 'bg-surface text-slate-500'
+                    ? 'bg-black/20 text-white'
+                    : 'bg-surface-secondary text-muted'
                 }`}
               >
                 {tab.count}
@@ -293,15 +302,15 @@ export const ActionCenter: React.FC<ActionCenterProps> = ({
       </div>
 
       {/* Items List */}
-      <div className="space-y-3">
+      <div className="space-y-2">
         {filteredItems.length === 0 ? (
-          <div className="bg-surface-card border border-surface-border rounded-xl p-12 text-center">
-            <CheckCircle className="w-10 h-10 text-slate-600 mx-auto mb-3" />
-            <h3 className="text-base font-semibold text-slate-300 mb-1">No items found</h3>
-            <p className="text-xs text-slate-500 max-w-sm mx-auto">
+          <div className="bg-surface-card border border-border rounded-md p-10 text-center">
+            <CheckCircle className="w-8 h-8 text-muted mx-auto mb-2" />
+            <h4 className="text-xs font-medium text-primary mb-1">No items in this view</h4>
+            <p className="text-[11px] text-muted max-w-xs mx-auto">
               {searchQuery
-                ? 'Try broadening your search query.'
-                : 'All caught up in this view! Select another filter or check back after new messages.'}
+                ? 'Try broadening your search criteria.'
+                : 'All caught up! Check back as new conversations arrive.'}
             </p>
           </div>
         ) : (
@@ -309,55 +318,69 @@ export const ActionCenter: React.FC<ActionCenterProps> = ({
             const userAction = itemActions[item.id] || 'active';
             const isCompleted = userAction === 'completed' || item.taskStatus === 'completed';
             const isDismissed = userAction === 'dismissed';
+            const isUrgent = item.level === 'urgent';
+            const isImportant = item.level === 'important';
 
             return (
               <div
                 key={item.id}
-                className={`bg-surface-card border rounded-xl p-4 transition-all ${
+                className={`bg-surface-card border rounded-md p-3 transition-colors ${
                   isDismissed
-                    ? 'opacity-40 border-surface-border bg-surface/30'
+                    ? 'opacity-40 border-border bg-surface-secondary/40'
                     : isCompleted
-                    ? 'border-emerald-500/30 bg-emerald-950/10'
-                    : item.level === 'urgent'
-                    ? 'border-red-500/30 hover:border-red-500/60 shadow-sm shadow-red-500/5'
-                    : 'border-surface-border hover:border-slate-600'
+                    ? 'border-semantic-success-border bg-semantic-success-bg/30'
+                    : isUrgent
+                    ? 'border-semantic-urgent-border/80 hover:border-semantic-urgent'
+                    : 'border-border hover:border-secondary'
                 }`}
               >
-                <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-3 mb-2">
-                  <div className="flex items-center space-x-2 flex-wrap gap-y-1">
+                <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-2 mb-1.5">
+                  <div className="flex items-center space-x-1.5 flex-wrap gap-y-1">
                     <span
-                      className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ${
-                        item.level === 'urgent'
-                          ? 'bg-red-500/15 text-red-400 border border-red-500/30'
-                          : item.level === 'important'
-                          ? 'bg-amber-500/15 text-amber-400 border border-amber-500/30'
-                          : 'bg-blue-500/15 text-blue-400 border border-blue-500/30'
+                      className={`px-1.5 py-0.2 rounded text-[10px] font-mono font-semibold uppercase ${
+                        isUrgent
+                          ? 'bg-semantic-urgent-bg text-semantic-urgent border border-semantic-urgent-border'
+                          : isImportant
+                          ? 'bg-semantic-important-bg text-semantic-important border border-semantic-important-border'
+                          : 'bg-semantic-info-bg text-semantic-info border border-semantic-info-border'
                       }`}
                     >
                       {item.level}
                     </span>
 
-                    <span className="px-2 py-0.5 rounded text-[10px] font-medium bg-surface text-slate-300 border border-surface-border uppercase">
+                    <span className="px-1.5 py-0.2 rounded text-[10px] font-mono uppercase bg-surface-secondary text-secondary border border-border">
                       {item.category}
                     </span>
 
                     {item.isAssignedToUser && (
-                      <span className="px-2 py-0.5 rounded text-[10px] font-bold bg-indigo-500/20 text-indigo-300 border border-indigo-500/30">
+                      <span className="px-1.5 py-0.2 rounded text-[10px] font-mono font-semibold bg-accent-soft text-accent border border-accent/20">
                         Assigned To You
                       </span>
                     )}
 
-                    <span className="text-[11px] text-slate-400">
-                      from <strong className="text-slate-300">{item.sender}</strong>
+                    {item.taskStatus && (
+                      <span className={`px-1.5 py-0.2 rounded text-[10px] font-mono uppercase ${
+                        isCompleted
+                          ? 'bg-semantic-success-bg text-semantic-success border border-semantic-success-border'
+                          : item.taskStatus === 'uncertain'
+                          ? 'bg-surface-secondary text-muted border border-border'
+                          : 'bg-semantic-important-bg text-semantic-important border border-semantic-important-border'
+                      }`}>
+                        {isCompleted ? 'Completed' : item.taskStatus}
+                      </span>
+                    )}
+
+                    <span className="text-[11px] text-muted">
+                      from <strong className="text-secondary font-medium">{item.sender}</strong>
                     </span>
                   </div>
 
-                  {/* Actions: Jump to Evidence, Mark Done, Dismiss */}
-                  <div className="flex items-center space-x-2 flex-shrink-0">
+                  {/* Actions */}
+                  <div className="flex items-center space-x-1.5 flex-shrink-0">
                     <button
                       onClick={() => onJumpToMessage(item.messageId)}
-                      className="text-xs text-brand-400 hover:text-brand-300 flex items-center space-x-1 bg-surface-subtle border border-surface-border px-2.5 py-1 rounded-md hover:border-brand-500/40 transition-colors"
-                      title="Inspect original cited message in Explorer"
+                      className="text-xs text-accent hover:text-accent-hover flex items-center space-x-1 bg-surface-secondary border border-border px-2 py-0.5 rounded hover:border-accent transition-colors"
+                      title="Inspect original message in Explorer"
                     >
                       <ExternalLink className="w-3 h-3" />
                       <span>Source</span>
@@ -368,10 +391,10 @@ export const ActionCenter: React.FC<ActionCenterProps> = ({
                         onClick={() =>
                           onUpdateItemAction(item.id, isCompleted ? 'active' : 'completed')
                         }
-                        className={`text-xs flex items-center space-x-1 px-2.5 py-1 rounded-md border transition-colors ${
+                        className={`text-xs flex items-center space-x-1 px-2 py-0.5 rounded border transition-colors ${
                           isCompleted
-                            ? 'bg-emerald-500/20 border-emerald-500/30 text-emerald-300 hover:bg-emerald-500/30'
-                            : 'bg-surface border-surface-border text-slate-300 hover:text-emerald-400 hover:border-emerald-500/40'
+                            ? 'bg-semantic-success-bg border-semantic-success-border text-semantic-success hover:bg-semantic-success-bg/80'
+                            : 'bg-surface-card border-border text-secondary hover:text-semantic-success hover:border-semantic-success-border'
                         }`}
                         title={isCompleted ? 'Mark Pending' : 'Mark Completed'}
                       >
@@ -384,40 +407,36 @@ export const ActionCenter: React.FC<ActionCenterProps> = ({
                       onClick={() =>
                         onUpdateItemAction(item.id, isDismissed ? 'active' : 'dismissed')
                       }
-                      className={`text-xs p-1.5 rounded-md border transition-colors ${
-                        isDismissed
-                          ? 'bg-surface border-surface-border text-slate-400 hover:text-slate-200'
-                          : 'bg-surface border-surface-border text-slate-500 hover:text-red-400 hover:border-red-500/40'
-                      }`}
+                      className="text-xs p-1 rounded border border-border bg-surface-card text-muted hover:text-primary transition-colors"
                       title={isDismissed ? 'Restore Item' : 'Dismiss Item'}
                     >
-                      {isDismissed ? <RotateCcw className="w-3.5 h-3.5" /> : <XCircle className="w-3.5 h-3.5" />}
+                      {isDismissed ? <RotateCcw className="w-3 h-3" /> : <XCircle className="w-3 h-3" />}
                     </button>
                   </div>
                 </div>
 
                 <h4
-                  className={`text-sm font-medium mb-1 ${
-                    isCompleted ? 'line-through text-slate-400' : 'text-slate-100'
+                  className={`text-xs font-medium mb-1 ${
+                    isCompleted ? 'line-through text-muted' : 'text-primary'
                   }`}
                 >
                   {item.title}
                 </h4>
 
                 {item.description && (
-                  <p className="text-xs text-slate-400 mb-2 leading-relaxed font-sans">
+                  <p className="text-[11px] text-secondary mb-1.5 leading-relaxed">
                     {item.description}
                   </p>
                 )}
 
-                <div className="flex items-center justify-between text-[11px] text-slate-500 pt-2 border-t border-surface-border/40">
-                  <div className="flex items-center space-x-2">
-                    <span className="text-slate-400 font-medium">Reason:</span>
-                    <span className="text-slate-300">{item.reason}</span>
+                <div className="flex items-center justify-between text-[10px] text-muted pt-1.5 border-t border-border/60">
+                  <div className="flex items-center space-x-1.5 truncate pr-2">
+                    <span className="font-medium text-secondary">Reason:</span>
+                    <span className="text-primary truncate">{item.reason}</span>
                   </div>
-                  <div className="flex items-center space-x-3">
-                    <span>Confidence {Math.round(item.confidence * 100)}%</span>
-                    <span>Score {item.score}/100</span>
+                  <div className="flex items-center space-x-2 font-mono flex-shrink-0">
+                    <span>{Math.round(item.confidence * 100)}% conf</span>
+                    <span>Score {item.score}</span>
                   </div>
                 </div>
               </div>
