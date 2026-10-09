@@ -1,0 +1,56 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    color-scheme: dark;
+  }
+
+  body {
+    background-color: #090D16;
+    color: #F1F5F9;
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+}
+
+/* Custom linear/raycast-style scrollbars */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #090D16;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #1E293B;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #334155;
+}
+
+/* Pulse highlight animation for message traceability */
+@keyframes highlightPulse {
+  0% {
+    background-color: rgba(99, 102, 241, 0.35);
+    border-color: rgba(129, 140, 248, 0.9);
+    box-shadow: 0 0 25px rgba(99, 102, 241, 0.4);
+  }
+  50% {
+    background-color: rgba(99, 102, 241, 0.2);
+    border-color: rgba(99, 102, 241, 0.6);
+  }
+  100% {
+    background-color: rgba(15, 23, 42, 0.8);
+    border-color: #1E293B;
+    box-shadow: none;
+  }
+}
+
+.highlight-source-message {
+  animation: highlightPulse 3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
